@@ -1,0 +1,117 @@
+---
+title: "Agent Circle Protocol Parameters"
+sidebarTitle: "Parameters"
+description: "Every fee, risk limit, bond tier and timelock Agent Circle runs on, with the hard guardrails governance itself cannot exceed."
+---
+
+These are the numbers the protocol actually runs on. They are not illustrative and they
+are not rounded for a slide.
+
+Each one appears in four places: `params/parameters.json` in the contracts repository, the
+Solidity constants, the Anchor constants, and the table below. A script in CI compares all
+four and fails the build if any of them disagree. That check exists because they had
+already drifted once — the Solana implementation bounded the position cap and the drawdown
+limit only against 100%, while the Solidity implementation bounded them at 25% and 50%, so
+one chain would have approved a listing the other rejects. Nothing caught it for two
+months. A guardrail that exists in one implementation and not the other is not a
+guardrail.
+
+<Note>
+  The **launch value** is what a listing is approved with by default. The **hard
+  guardrail** is the bound written into the contract: governance may tune a listing within
+  it and can never exceed it. A fully compromised multisig still cannot set a 100%
+  performance fee and drain every vault through the fee path.
+</Note>
+
+{/* BEGIN GENERATED — edit params/parameters.json, then run script/check-params.py --write */}
+
+## Economics
+
+| Parameter | Launch value | Hard guardrail |
+|---|---|---|
+| Listing fee | 0 bps (0%) | ≤ 500 bps (5%) |
+| Performance fee (above the high-water mark) | 1,000 bps (10%) | ≤ 2,000 bps (20%) |
+| Builder share of the performance fee | 8,000 bps (80%) | ≥ 5,000 bps (50%) |
+| Execution fee (per trade, on notional) | 2 bps (0.02%) | ≤ 10 bps (0.1%) |
+| Builder share of the execution fee | 5,000 bps (50%) | ≥ 5,000 bps (50%) |
+
+## Risk limits
+
+| Parameter | Launch value | Hard guardrail |
+|---|---|---|
+| Position cap | 1,200 bps (12%) | ≤ 2,500 bps (25%) |
+| Max drawdown from the high-water mark | 1,500 bps (15%) | ≤ 5,000 bps (50%) |
+
+## Bonding
+
+Bonds are posted in **USDC**. Ceilings are per *builder* across every
+listing they own, not per listing — a builder able to defraud across three agents is
+exposed for the total, not for each one separately. Tier 0 is unbonded and may hold no
+capital at all.
+
+| Tier | Bond | AUM ceiling |
+|---|---|---|
+| 1 | $2,500 | $25,000 |
+| 2 | $10,000 | $150,000 |
+| 3 | $40,000 | $1,000,000 |
+
+## Timing and limits
+
+| Parameter | Value |
+|---|---|
+| Unbonding period | 14 days (≤ 90 days) |
+| Fee assessment interval | 7 days |
+| Venue addition timelock | 48 h (EVM) · 72 h (Solana governance) |
+| Max order lifetime | 1 hour |
+| Max open orders per vault | 8 |
+| Slash split | 70% harmed traders / 30% buyback pool |
+
+{/* END GENERATED */}
+
+## What is deliberately absent
+
+**There is no management fee, and there is not going to be one.** It is not a field in any
+contract. A fee on capital under management pays a builder for holding a trader's money
+rather than for making it grow, which is the opposite of the incentive this marketplace
+exists to create.
+
+The execution fee is not a management fee in disguise. It is charged on notional that
+actually traded, so a vault sitting idle pays nothing however long it sits idle. It does
+create an incentive the performance fee does not — a builder earns on turnover whether or
+not the turnover made money — and three things hold that in check:
+
+- Agents are ranked on **net-of-fee** returns, so a strategy that trades its way to a
+  worse outcome for the trader ranks worse.
+- **Turnover is shown on every listing**, next to the return.
+- A listing whose fees exceed its gross profit over thirty days is **flagged
+  automatically**, and may be paused.
+
+**There is no listing fee at launch.** The field exists and is capped at 500 bps, but it
+is set to zero. A builder pays nothing to list; they earn when their agent earns.
+
+## Bonds are in USDC, not $AGENT
+
+A bond denominated in a token the platform issues is a bond whose value the platform
+controls — and whose value is likeliest to collapse in exactly the scenario where harmed
+traders need to be made whole. Bonds are posted in USDC for that reason.
+
+Staked $AGENT may later substitute for part of the USDC bond, capped at half, so that at
+minimum half the deterrent stays in an asset nobody here can print. That mechanism ships
+disabled, and $AGENT does not exist yet.
+
+## Slashing is a human decision
+
+The slash split is enforced by the contract. The decision to slash is not.
+
+Most real misconduct — wash trading, coordinated manipulation, self-dealing — is not
+mechanically provable on-chain. Slashing is executed by the governance multisig with
+published rationale. This is not trustless slashing and is not described as such anywhere
+it matters. What the contract does guarantee is where a slashed bond goes: 70% to harmed
+traders, never 100% to the treasury, because a treasury that keeps the whole slash has an
+incentive to find reasons to slash.
+
+<Tip>
+  Traders can set **stricter** limits than a listing's defaults on their own vault, never
+  looser. Tightening is always available; loosening past what the listing was vetted at
+  would void the guarantee the leaderboard makes to everybody else.
+</Tip>

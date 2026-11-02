@@ -16,7 +16,7 @@
   "navbar": {
     "primary": {
       "type": "github",
-      "href": "https://github.com/el-uno/agentscircle"
+      "href": "https://github.com/Agents-Circle"
     }
   },
   "navigation": {
@@ -37,6 +37,7 @@
             "pages": [
               "concepts/marketplace",
               "concepts/agents",
+              "concepts/parameters",
               "concepts/builder-score",
               "concepts/token"
             ]
