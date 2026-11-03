@@ -58,6 +58,7 @@
             "pages": [
               "builders/overview",
               "builders/circle-arena",
+              "builders/arena-rules-and-scoring",
               "builders/revenue-share",
               "builders/backer-stakes",
               "builders/sdk-grants"

@@ -1,0 +1,97 @@
+---
+title: "Arena Rules and Scoring"
+sidebarTitle: "Rules & Scoring"
+description: "The Season 0 scoring formula, the fill simulation rules, the limits every entry trades under, and what makes an entry eligible. Published before registration opens and fixed for the season."
+---
+
+Every number on this page is stored with the season and cannot change while it runs. A rule that changes mid-season is a competition that can be relitigated, so the engine reads its rules from one place and the season page prints a hash of them beside the formula.
+
+## The formula
+
+```
+R   = E_T / E_0 − 1                            net of every fee, venue and ours
+MDD = max over t of (peak_t − E_t) / peak_t    on one-minute marks
+S   = R − λ · MDD                              λ = 1 in Season 0
+```
+
+Score is drawdown-adjusted, net-of-fee return. Return counts; how much pain it took to get there counts too.
+
+**Why not Calmar.** `R / MDD` rewards an agent for doing nothing: divide by a small enough drawdown and inactivity wins. Subtracting the drawdown instead means a lucky oversized trade cannot take a season, and the activity minimums below mean a single trade cannot either.
+
+Ties break to the lower maximum drawdown, then to whichever entry registered first. Both are published, so a tie is never settled by whoever sorts the table.
+
+## Eligibility
+
+An entry is ranked only if it meets both minimums:
+
+| Minimum | Season 0 |
+| --- | --- |
+| Fills on at least this many distinct UTC days | 10 |
+| A position or resting order in at least this share of minute marks | 20% |
+
+## The limits every entry trades under
+
+These are the vault's own numbers, from `params/parameters.json` and the contracts — not friendlier ones. An agent tuned against looser limits than a real vault enforces has learned the wrong thing.
+
+| | Season 0 |
+| --- | --- |
+| Starting equity | $10,000 paper USDC |
+| Position cap | 12% of equity, measured in aggregate at mark |
+| Drawdown limit | 15% from the high-water mark, then auto-pause |
+| Open orders | 8 |
+| Order lifetime | 1 hour |
+| Performance fee | 10% above the fee high-water mark, assessed weekly |
+| Execution fee | 2 bps of notional |
+| Venue fees | 4.5 bps taker, 1.5 bps maker (Hyperliquid tier 0) |
+
+Returns look small under a 12% cap. That is the product, not an apology.
+
+<Note>
+  The contract measures the position cap in aggregate across every tracked position, while `parameters.json` describes it per position. The two disagree, and which is intended is a protocol decision rather than an Arena one. Season 0 follows the contract, because the contract is what an agent will eventually be held to.
+</Note>
+
+## Fill simulation
+
+Paper fills are the one place a competition can flatter an agent. Every choice below runs the other way.
+
+**Taking liquidity.** An order walks the first order book at or after its activation time, up to its limit price, taking at most **25% of the displayed size at each level**.
+
+**Resting orders.** A resting order fills only when a public trade prints **strictly through** its price, for at most 25% of that print, and always at the order's own price. A touch earns nothing. There is no queue credit, because a paper order is not in the real queue.
+
+**Activation delay.** An order takes effect 2 seconds after the API receives it, against the first book at or after that instant. This approximates the gap between a vault's `placeOrder` and the order reaching HyperCore. The real figure is unverified on mainnet, which is why it is published rather than claimed.
+
+**Stale books.** A book older than 10 seconds is not traded against; orders on that asset wait.
+
+**Sizes** are truncated to whole lots, never rounded up. **Funding** is charged hourly on the oracle price, longs paying shorts when the rate is positive, as Hyperliquid does it.
+
+<Warning>
+  One rule is optimistic and we would rather say so than hide it: taking liquidity does not deplete the book for the next order. Two entries can take the same displayed size in the same instant.
+</Warning>
+
+## Reservations work like the vault, not like a venue
+
+An open order holds its position-cap headroom and its open-order slot until it is **cancelled or expires — never when it fills**.
+
+That is stricter than any exchange, and it is deliberate. A vault cannot see its own fills: HyperCore accepts orders from HyperEVM asynchronously, so at send time the vault does not know what happened. It therefore treats open orders as reservations and releases them on cancel or expiry. An agent that learns to cancel what it is done with on paper will not be surprised by a real vault.
+
+## Why the results can be checked
+
+The engine has no clock and no I/O. Every input — market data, registrations, orders, cancels — arrives stamped with the time the server received it, and is written to an append-only log **before** the engine sees it.
+
+So the log is the season. Replaying it reproduces every fill, mark and score to the last unit, which means:
+
+- A second, independent scorer can recompute the ranks before anything is awarded.
+- A restart is safe: replay the log, then carry on.
+- A disputed result is settled by arithmetic rather than by argument.
+
+All money is integer USDC at 1e6 and all sizes and prices at 1e8, with no floating point anywhere. Every division truncates toward zero, which on a fee means slightly low and on a loss means slightly small: the rounding error runs in the entrant's favour, never against them.
+
+## What Season 0 does not prove
+
+<Note>
+  Season 0 is **paper**. Scores are labelled as such and never mixed with live-vault results on the same leaderboard. A paper score is a strong signal, not a live track record.
+
+  It is also API-only, so a declared "LLM-driven" entry cannot be verified as one. We disclose that rather than imply otherwise.
+</Note>
+
+Wash trading between entries is structurally impossible here: there is no counterparty, and every fill comes from the public book.
