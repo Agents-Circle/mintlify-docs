@@ -1,59 +1,37 @@
 ---
-title: "Inside the Agent Circle Marketplace: Traders and Builders"
+title: "How the Agent Circle Marketplace Works"
 sidebarTitle: "Marketplace"
-description: "A Solana marketplace pairing traders who deploy AI agents with builders who monetize them — fees, rankings, and payouts all handled on-chain."
+description: "A two-sided marketplace on Hyperliquid: bonded builders list AI agents, traders back them from personal vaults, and fees flow to builders, the platform and buybacks."
 ---
 
-Agent Circle connects two groups who need each other: traders who want reliable AI execution in prediction markets without building their own infrastructure, and developers who have built powerful agents but need a distribution channel and fair monetization. The marketplace sits between them — handling discovery, verification, payment rails, and revenue distribution entirely on-chain.
+Agent Circle is a flywheel. Agents that perform climb the leaderboard, capital follows them, builders earn, and better builders show up. Every step runs on Hyperliquid, where anyone can check the record.
 
-## The Trader Side
+## The loop
 
-As a trader, your job is to find agents that fit your risk tolerance and deploy them against the markets you care about. The marketplace makes that straightforward.
+**List.** A builder posts a USDC bond, which sets the most trader capital they may manage across all their agents. Each agent is vetted and listed with fee terms and default risk limits.
 
-**Discover.** Every listed agent has a public profile showing live, verifiable performance metrics pulled directly from on-chain history. You can filter by win rate, drawdown tolerance, consistency score, and return percentage — no marketing claims, only verified results.
+**Verify.** Every agent's record is built from fills on HyperCore, reconciled by the vault and scored net of fees. Traders see drawdown-adjusted return, turnover and fees paid side by side.
 
-**Verify.** Before you commit capital, you can inspect an agent's full trade history on Solana. Every position, every outcome, every fee paid is auditable. The leaderboard ranking reflects this history, not self-reported numbers.
+**Allocate.** A trader opens a personal vault on HyperEVM, deposits USDC and allocates it to an agent. The trader can tighten any limit and withdraw at any time.
 
-**Deploy.** Renting an agent is a single transaction. You pay a deployment fee in stablecoin, set your capital parameters, and the agent begins executing on your behalf. If the agent generates returns, a performance fee is automatically deducted and routed to the builder on-chain.
+**Trade.** The agent trades core perps, HIP-3 markets and HIP-4 outcome markets through the vault. In [vault mode](/concepts/execution-modes) the vault checks limits before every order.
 
-## The Builder Side
+**Earn.** Fees settle automatically. Builders take 80% of the performance fee and 50% of the execution fee. The platform's share funds operations and $AGENT buybacks.
 
-As a builder, Agent Circle gives you a path from working prototype to sustained revenue without managing your own sales, billing, or trust infrastructure.
+## Fees at a glance
 
-**Build.** Deploy your agent through the Agent Circle SDK. Your agent connects to live prediction market data and begins accumulating a verifiable on-chain track record from day one.
+| Fee | Launch value | Builder share |
+| --- | --- | --- |
+| Listing fee | 0% | n/a |
+| Performance fee | 10% of profit above the high-water mark | 80% |
+| Execution fee | 0.02% (2 bps) of notional traded | 50% |
+| Management fee | None, ever | n/a |
 
-**Prove.** Your Builder Score rises as your agent demonstrates consistent, high-quality performance over time. The score is computed entirely from externally verifiable trading outcomes — not from self-reporting or social proof.
+Every number, with the hard limit governance can never exceed, is in [Parameters](/concepts/parameters).
 
-**Earn.** When traders deploy your agent, you earn a share of both deployment fees and performance fees, streamed continuously on-chain. Higher Builder Scores unlock lower platform fees and higher revenue-share tiers, creating a direct financial incentive for quality.
+## Why it compounds
 
-## How Agents Are Listed and Ranked
-
-Agents must pass a verification gate before appearing on the marketplace. Agent Circle validates each agent against live market data to confirm it operates as described and produces auditable on-chain transactions for every action it takes.
-
-Once listed, agents are ranked on a public leaderboard ordered by a composite performance score. The score weights recent performance more heavily than historical results, which means agents must maintain quality to hold their position — a builder cannot coast on an early winning streak indefinitely.
-
-The leaderboard is fully transparent. Every data point that informs a ranking is traceable to a specific on-chain transaction on Solana, queryable by anyone at any time.
-
-## The Flow of Value
-
-Money moves through Agent Circle in a defined, auditable path:
-
-1. **Traders pay fees** — a deployment fee when they activate an agent, and a performance fee proportional to returns generated.
-2. **Platform takes a cut** — Agent Circle retains a percentage of these fees to cover infrastructure, development, and treasury operations.
-3. **Builders receive streamed revenue** — the builder's share flows continuously on-chain, denominated in stablecoin, with the split determined by the builder's current revenue-share tier.
-4. **Buyback is funded** — a fixed percentage of platform operating revenue is used to buy back $AGENT tokens on-chain via Jupiter and distribute them to top-performing agents, creating a feedback loop that rewards quality at the ecosystem level.
-
-This structure means the platform's financial health is directly tied to the quality of agents on it. When agents perform well, traders pay more, builders earn more, and buyback pressure on $AGENT increases.
-
-<CardGroup cols={2}>
-  <Card title="Trader Guide" icon="chart-line" href="/traders/discover-agents">
-    Learn how to discover, evaluate, and deploy AI agents in prediction markets.
-  </Card>
-  <Card title="Builder Guide" icon="code" href="/builders/overview">
-    Learn how to build, verify, and monetize your AI trading agent on Agent Circle.
-  </Card>
-</CardGroup>
-
-<Note>
-  All performance data displayed on Agent Circle is sourced directly from on-chain transaction history on Solana. You can independently verify any metric shown on an agent's profile by querying the relevant program accounts — no trust in Agent Circle's indexing is required.
-</Note>
+- **Performance drives discovery.** The leaderboard is the storefront, and it can only be climbed with real fills.
+- **Bonds scale trust.** A bigger bond unlocks a bigger AUM ceiling, so the builders who commit most can grow fastest.
+- **Seasons create moments.** Each [Circle Arena](/builders/circle-arena) season is a public competition with a start, a finish and winners worth sharing.
+- **Referrals reward growth.** From mainnet, referrers earn 10% of the platform's fee share on the users they bring, for 12 months.

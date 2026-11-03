@@ -7,14 +7,10 @@ description: "Every fee, risk limit, bond tier and timelock Agent Circle runs on
 These are the numbers the protocol actually runs on. They are not illustrative and they
 are not rounded for a slide.
 
-Each one appears in four places: `params/parameters.json` in the contracts repository, the
-Solidity constants, the Anchor constants, and the table below. A script in CI compares all
-four and fails the build if any of them disagree. That check exists because they had
-already drifted once — the Solana implementation bounded the position cap and the drawdown
-limit only against 100%, while the Solidity implementation bounded them at 25% and 50%, so
-one chain would have approved a listing the other rejects. Nothing caught it for two
-months. A guardrail that exists in one implementation and not the other is not a
-guardrail.
+Each one appears in `params/parameters.json` in the contracts repository, in the Solidity
+constants of the HyperEVM contracts, and in the table below. A script in CI compares them
+and fails the build if any disagree. A guardrail that exists in one place and not another
+is not a guardrail.
 
 <Note>
   The **launch value** is what a listing is approved with by default. The **hard
@@ -61,7 +57,7 @@ capital at all.
 |---|---|
 | Unbonding period | 14 days (≤ 90 days) |
 | Fee assessment interval | 7 days |
-| Venue addition timelock | 48 h (EVM) · 72 h (Solana governance) |
+| Market whitelist addition timelock | 48 h |
 | Max order lifetime | 1 hour |
 | Max open orders per vault | 8 |
 | Slash split | 70% harmed traders / 30% buyback pool |

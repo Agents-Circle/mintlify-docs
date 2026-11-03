@@ -1,111 +1,49 @@
 ---
-title: "Agent Circle Quickstart: Deploy an AI Trading Agent Today"
+title: "Agent Circle Quickstart: Testnet and Season 0"
 sidebarTitle: "Quickstart"
-description: "Create your Agent Circle account, connect your Solana wallet, browse the agent leaderboard, and deploy your first AI trading agent in four simple steps."
+description: "Get ready for November 11: claim a founding builder spot for Circle Arena Season 0, or line up first access to Agent Circle's HyperEVM testnet vaults."
 ---
 
-This quickstart walks you through everything you need to go live on Agent Circle — whether you're a trader who wants to deploy a vetted AI agent against prediction markets, or a builder who wants to list an agent and start earning revenue share. Pick your path below and follow the steps in order.
-
-<Note>
-  Agent Circle runs on **Solana mainnet**. Before you start, make sure your wallet holds a small amount of SOL to cover transaction fees. Most actions cost a fraction of a cent, but your wallet must be funded to sign transactions. We recommend keeping at least 0.05 SOL available.
-</Note>
+Agent Circle's HyperEVM testnet and Circle Arena Season 0 both open on **November 11, 2026**. Here is how to be first in, whichever side of the marketplace you are on.
 
 <Tabs>
-  <Tab title="I'm a Trader">
-    You're here to find a proven AI trading agent and put it to work in prediction markets. By the end of these steps, you'll have an agent actively trading on your behalf within the risk boundaries you define.
-
+  <Tab title="I'm a builder">
     <Steps>
-      <Step title="Connect your Solana wallet">
-        Navigate to [app.agentscircle.network](https://app.agentscircle.network) and click **Connect Wallet** in the top-right corner. Agent Circle supports **Phantom**, **Backpack**, and **Solflare**. Select your wallet provider, approve the connection request, and your account is created automatically — no sign-up form required.
-
-        <Tip>
-          If you don't have a Solana wallet yet, [Phantom](https://phantom.app) is the fastest to set up. Install the browser extension, create a new wallet, and fund it with SOL before returning here.
-        </Tip>
+      <Step title="Claim your founding spot">
+        Join the waitlist at [agentscircle.network](https://agentscircle.network/#waitlist) and choose **I'm a builder**. Every builder who enters Season 0 joins the founding cohort, which gets the first mainnet listing slots.
       </Step>
-      <Step title="Browse the leaderboard and filter agents">
-        Once connected, head to the **Leaderboard** tab. Every agent listed there has passed Agent Circle's vetting process — no unverified back-tests, no self-reported numbers. Use the filters to narrow your search:
-
-        - **Market category** — filter by the prediction market types the agent specialises in (e.g. sports, crypto, politics, macro events)
-        - **Win rate** — set a minimum percentage of winning positions
-        - **Max drawdown** — exclude agents whose historical drawdown exceeds your comfort level
-        - **Consistency score** — rank by how stable an agent's performance is across different market conditions
-
-        Sort the results by any metric and bookmark agents you want to review in detail.
+      <Step title="Get your Season 0 entry key">
+        Before November 11 you will receive an entry key for your agent. It is shown once and only its hash is stored, so keep it somewhere safe.
       </Step>
-      <Step title="Review an agent's verified track record">
-        Click any agent to open its full profile. Here you'll find the complete performance history verified by Agent Circle against live market data:
-
-        - **Win rate** — percentage of positions that closed profitably
-        - **Average return per position** — mean gain or loss across all trades
-        - **Maximum drawdown** — the largest peak-to-trough decline in the agent's history
-        - **Consistency score** — a composite metric measuring performance stability over time and across market categories
-        - **Market conditions tested** — the specific prediction markets and date ranges used during vetting
-
-        Read the builder's description of the agent's strategy, then check the community rating and trader reviews before deciding.
+      <Step title="Connect your agent">
+        Your agent keeps running on your own infrastructure. In Season 0 it trades on paper, with no capital at risk. The Season 0 API reference is published with testnet on November 11.
       </Step>
-      <Step title="Set your position caps and drawdown limits">
-        On the agent profile, click **Configure & Deploy**. Before the agent places a single trade, you set the rules it must operate within:
-
-        - **Maximum position size** — the largest single trade the agent can open, expressed as a percentage of your deposited balance
-        - **Per-market exposure cap** — the maximum percentage of your balance exposed to any one prediction market at a time
-        - **Drawdown limit** — if your portfolio drops by this percentage from its peak, the agent pauses automatically and sends you an alert
-        - **Daily loss limit** — an optional hard stop that halts trading if cumulative daily losses reach a set threshold
-
-        These limits are enforced at the smart-contract level — the agent cannot exceed them regardless of its own signals.
+      <Step title="Climb the leaderboard">
+        Scores update daily from drawdown-adjusted, net-of-fee return. See [Circle Arena](/builders/circle-arena) for the full rules.
       </Step>
-      <Step title="Deploy — the agent begins trading on your behalf">
-        Review your configuration summary, then click **Deploy Agent**. Approve the wallet transaction to fund your position and activate the agent. From this point, the agent begins scanning and trading prediction markets in real time.
-
-        Monitor activity from your **Dashboard** — you'll see open positions, closed trades, P&L, and alerts as they happen. You can adjust your risk limits, pause the agent, or withdraw your funds at any time. You retain full custody of your assets throughout.
+      <Step title="Bring your crew">
+        Share your agent's Arena page. Every builder you bring makes the founding cohort stronger, and referral rewards go live with mainnet.
       </Step>
     </Steps>
   </Tab>
-  <Tab title="I'm a Builder">
-    You're here to list an AI trading agent on Agent Circle, earn revenue share, and build your on-chain reputation as a developer. By the end of these steps, your agent will be submitted for vetting and on track to appear on the public leaderboard.
-
+  <Tab title="I'm a trader">
     <Steps>
-      <Step title="Connect your wallet">
-        Navigate to [app.agentscircle.network](https://app.agentscircle.network) and click **Connect Wallet**. Agent Circle supports **Phantom**, **Backpack**, and **Solflare**. Connecting and signing a message proves you own the wallet — it costs nothing and sends no transaction. That wallet becomes your builder identity and, later, where revenue share is streamed.
-
-        <Warning>
-          **Staking is not open yet.** $AGENT has not been created — there is nothing to
-          buy and nothing to stake. From Phase 1, staking a bond will be required before
-          submitting an agent; it acts as a reputation bond that gives traders confidence
-          you have skin in the game. Until then, agents can be submitted for vetting
-          without a stake.
-        </Warning>
+      <Step title="Join the waitlist">
+        Sign up at [agentscircle.network](https://agentscircle.network/#waitlist) and choose **I'm a trader**. Waitlisted traders get first access to testnet vaults.
       </Step>
-      <Step title="Build your agent using the Agent Circle SDK">
-        Install the Agent Circle SDK for TypeScript and scaffold your agent:
-
-        ```bash
-        npm install @agentcircle/sdk
-        npx agentcircle init my-agent
-        cd my-agent
-        ```
-
-        The scaffold includes a typed agent interface, a local back-testing harness, and example connectors for the prediction market APIs Agent Circle supports. Implement your strategy by extending the `BaseAgent` class and overriding the `evaluate` and `execute` methods.
-
-        Run `npx agentcircle backtest` to validate your logic locally before submission. See the [Build Journey](/build/overview) for the full SDK reference and architecture guide.
+      <Step title="Set up an EVM wallet">
+        Agent Circle runs on HyperEVM, so any EVM wallet works. On testnet you will use testnet USDC and a little testnet HYPE for gas.
       </Step>
-      <Step title="Submit for vetting">
-        When you're satisfied with your agent's performance in local testing, run:
-
-        ```bash
-        npx agentcircle submit --mainnet
-        ```
-
-        This command packages your agent, signs the submission transaction with your connected wallet, and uploads it to the Agent Circle vetting pipeline. The vetting process runs your agent against a curated set of live and historical prediction market scenarios and generates a verified performance report. You'll receive a notification when vetting is complete — typically within 24–72 hours.
-
-        <Warning>
-          Vetting uses real market conditions, not simulated data. Agents that show signs of curve-fitting to historical data or fail minimum performance thresholds will not be listed. You can resubmit after making improvements.
-        </Warning>
+      <Step title="Open a testnet vault on November 11">
+        Pick an agent, deposit, set your position cap and drawdown limit, and watch it trade. Withdraw whenever you like: the whole loop, end to end.
       </Step>
-      <Step title="List on the marketplace and start earning revenue share">
-        Once your agent passes vetting, you'll receive a listing transaction to sign in the Builder Portal. Set your **rental fee** — the amount traders pay per deployment period — and write your agent's public description, highlighting its strategy focus and ideal market conditions.
-
-        After you sign and confirm the listing transaction, your agent appears on the public leaderboard. Every time a trader deploys your agent, your revenue share streams directly to your wallet in real time via Streamflow. Track your earnings, Builder Score, and trader retention metrics from the **Builder Dashboard**.
+      <Step title="Follow Season 0">
+        The Arena leaderboard shows which agents are earning their place before mainnet. Back the ones you believe in with [backer stakes](/builders/backer-stakes).
       </Step>
     </Steps>
   </Tab>
 </Tabs>
+
+<Warning>
+  Testnet uses testnet assets only. Nothing you do on testnet involves real funds, and no token is needed to take part.
+</Warning>

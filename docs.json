@@ -28,6 +28,7 @@
             "group": "Get Started",
             "pages": [
               "introduction",
+              "why-hyperliquid",
               "quickstart",
               "roadmap"
             ]
@@ -37,6 +38,7 @@
             "pages": [
               "concepts/marketplace",
               "concepts/agents",
+              "concepts/execution-modes",
               "concepts/parameters",
               "concepts/builder-score",
               "concepts/token"
@@ -55,8 +57,9 @@
             "group": "For Builders",
             "pages": [
               "builders/overview",
+              "builders/circle-arena",
               "builders/revenue-share",
-              "builders/sub-tokens",
+              "builders/backer-stakes",
               "builders/sdk-grants"
             ]
           },

@@ -1,0 +1,49 @@
+---
+title: "Execution Modes: Vault Mode and Fast Mode"
+sidebarTitle: "Execution Modes"
+description: "Agent Circle vaults trade HyperCore in two modes. Vault mode checks limits before every order; fast mode trades at full speed with limits monitored and a kill switch."
+---
+
+Every Agent Circle vault is its own HyperCore account, owned by its trader. Agents trade through it in one of two modes. Custody holds in both: in either mode, only the trader can withdraw.
+
+## Vault mode (default)
+
+The agent asks the vault to place each order. Before anything is sent to HyperCore, the vault checks that:
+
+1. The vault is active.
+2. The listing is live.
+3. The caller is the listing's agent key.
+4. The market is on the whitelist.
+5. Worst-case exposure, including every order still outstanding, stays within the position cap at the current mark price.
+6. Equity is within the drawdown limit from the high-water mark.
+
+Orders that only reduce exposure skip the cap check, so a vault over its cap can always get back under it.
+
+**What we claim:** limits are checked before every order and reconciled continuously.
+
+### Why "reconciled"
+
+HyperCore accepts orders from HyperEVM asynchronously, a few seconds after they are sent, and the vault cannot see at send time whether an order was accepted. So the vault treats its open orders as reservations and reconciles them against HyperCore:
+
+- Anyone can call `reconcile`; it only ever releases reservations or pauses a vault in the trader's favour.
+- A reservation expires after 1 hour even if nobody reconciles.
+- The trader can cancel every reservation in one transaction with `cancelAll`.
+- The execution fee is charged at reconcile, on size that actually changed, so a trader never pays for an order HyperCore rejected.
+
+## Fast mode (trader opt-in)
+
+The vault registers the agent's key as a HyperCore API wallet and approves Agent Circle's builder code. The agent then signs orders directly, with no delay, and builder-code revenue accrues.
+
+The vault does not see those orders, so limits are **monitored, not enforced**: a keeper watches the vault and triggers the drawdown kill switch, which pauses the vault and closes positions. An API wallet can trade but can never withdraw.
+
+**What we claim:** limits are monitored, with an automatic kill switch. You will type "monitored, not enforced" before you can turn fast mode on.
+
+## Which to choose
+
+| | Vault mode | Fast mode |
+| --- | --- | --- |
+| Limits | Checked before every order | Monitored by a keeper |
+| Speed | A few seconds per order | Native HyperCore speed |
+| Builder-code revenue | No | Yes |
+| Withdrawal | Trader only | Trader only |
+| Available | Testnet from Nov 11 | After mainnet |
