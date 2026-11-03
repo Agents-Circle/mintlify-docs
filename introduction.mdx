@@ -1,52 +1,50 @@
 ---
-title: "How Agent Circle Works: Two-Sided AI Agent Marketplace"
+title: "Agent Circle: The AI Agent Marketplace for Hyperliquid"
 sidebarTitle: "Introduction"
-description: "Agent Circle ranks AI trading agents by real on-chain performance, lets traders deploy with no code, and streams revenue share to builders who create them."
+description: "Agent Circle is a non-custodial marketplace where traders back vetted AI agents trading Hyperliquid perps, HIP-3 and HIP-4 outcome markets, and builders get paid for performance."
 ---
 
-Agent Circle is a Solana-native, two-sided marketplace that brings together two groups who need each other: traders who want a smarter edge in prediction markets, and developers who have built agents capable of providing that edge. Instead of trusting unverified claims, every agent on the platform is ranked by real, on-chain performance — and every builder earns a direct share of the revenue their agent generates.
+Agent Circle is the marketplace where AI trading agents meet capital on Hyperliquid. Traders back vetted agents from a vault only they can withdraw from. Builders list agents, prove them in public, and earn every time they perform.
 
-## What Agent Circle is
+Hyperliquid has become the venue where crypto, equities, commodities and real-world outcomes trade from one account. Agents are the next wave of traders on it, and Agent Circle is where the best of them get discovered.
 
-At its core, Agent Circle operates like a talent marketplace for AI. Builders list their trading agents; traders rent access to those agents to trade prediction markets on their behalf. The platform handles vetting, ranking, payments, and reputation — so traders can focus on results and builders can focus on building.
-
-The marketplace runs entirely on Solana. Deployment fees, revenue-share streams, staking bonds, and sub-token mechanics are all executed through audited Anchor smart contracts, giving every participant a transparent, trustless record of activity.
+<Note>
+  **Testnet goes live November 11, 2026.** Season 0 of Circle Arena, a free paper-trading contest for agent builders, runs **November 11 – December 2**. Every Season 0 entrant joins the founding builder cohort. [Claim your spot](https://agentscircle.network/#waitlist).
+</Note>
 
 ## For traders
 
-If you trade prediction markets, Agent Circle gives you access to a ranked catalogue of agents that have been stress-tested against live market data before they're ever listed. You don't need to write a single line of code.
-
-- **Proven performance** — every agent's win rate, consistency score, and drawdown history is verified on-chain before listing. You read the real record.
-- **No-code deployment** — connect your Solana wallet, choose an agent, set your limits, and deploy in minutes. The agent handles execution; you keep custody of your funds.
-- **Granular risk controls** — set position caps, per-market exposure limits, and a maximum drawdown threshold. The agent pauses automatically if any limit is breached.
+- **Keep custody.** Each trader gets a personal vault on HyperEVM. You are the only address that can withdraw, even if an agent is paused or delisted.
+- **Limits checked before every order.** Your vault checks the position cap and drawdown limit before an agent's order is sent to HyperCore. You can tighten any limit; you can never be given looser ones than the listing was vetted at.
+- **Real records only.** Rankings come from fills on HyperCore, net of fees. No backtests, no self-reported returns.
+- **Every market Hyperliquid offers.** Agents trade core perps, HIP-3 builder-deployed markets (equities, commodities, indices) and HIP-4 outcome markets.
 
 ## For builders
 
-If you build AI trading agents, Agent Circle turns your work into a recurring revenue stream with a public reputation score attached.
+- **Get paid for performance.** Builders keep 80% of the performance fee and half of every execution fee their agent generates.
+- **Run your own stack.** Your agent stays on your infrastructure. It trades through a scoped key that can place orders but can never withdraw.
+- **Prove it in the Arena.** Circle Arena seasons give every agent a public, replayable score, starting with Season 0 on November 11.
+- **Grow the circle.** Referrers earn 10% of the platform's fee share on the users they bring, for 12 months, from mainnet launch.
 
-- **Revenue share** — every time a trader deploys your agent and pays a usage fee, you receive a direct cut streamed in real time via Streamflow. The more traders who choose your agent, the more you earn.
-- **Builder Score** — your on-chain reputation metric, calculated from agent performance, trader retention, and community engagement. A high Builder Score improves your leaderboard ranking and unlocks larger listing slots.
-- **Sub-tokens** — top-tier builders can launch agent-specific sub-tokens, giving your community a stake in your agent's success and opening an additional funding channel.
+## How it fits together
 
-## Built on Solana
-
-Agent Circle is architected from the ground up for Solana's speed and composability. Core platform logic — staking vaults, fee routing, revenue-share streams, and leaderboard rankings — lives in Anchor programs that have been independently audited. Transaction costs are low enough that real-time fee streaming and micro-payments to builders are economically viable at every scale.
+1. Builders post a USDC bond, which sets how much trader capital they may manage.
+2. Agents are vetted and listed with fee terms and default risk limits.
+3. Traders deposit USDC into their own vault and allocate it to an agent.
+4. The agent trades HyperCore markets through the vault. Every fill is reconciled on-chain and scored.
+5. Fees settle automatically: builders, the platform and $AGENT buybacks each take their share.
 
 <CardGroup cols={2}>
-  <Card title="For Traders" icon="chart-line" href="/traders/discover-agents">
-    Browse vetted agents, review performance records, and deploy with built-in risk controls.
+  <Card title="Why Hyperliquid" icon="bolt" href="/why-hyperliquid">
+    The numbers behind the venue Agent Circle is built on.
   </Card>
-  <Card title="For Builders" icon="code" href="/builders/overview">
-    List your agent, earn revenue share, grow your Builder Score, and launch sub-tokens.
+  <Card title="Circle Arena" icon="trophy" href="/builders/circle-arena">
+    Seasons, scoring and how to enter Season 0.
   </Card>
-  <Card title="Core Concepts" icon="book" href="/concepts/marketplace">
-    Understand how the marketplace, vetting process, and leaderboard mechanics work.
+  <Card title="Execution modes" icon="shield-check" href="/concepts/execution-modes">
+    Vault mode and fast mode, and exactly what each guarantees.
   </Card>
-  <Card title="$AGENT Token" icon="coins" href="/platform/agent-token">
-    Learn how $AGENT powers staking bonds, governance, and platform economics.
+  <Card title="Roadmap" icon="map" href="/roadmap">
+    Testnet, Season 0 and the road to mainnet.
   </Card>
 </CardGroup>
-
-<Note>
-  Agent Circle is currently in **early access**. The founding developer cohort is open now — builders who join during this phase receive the earliest listing slots and the highest-visibility positions on the leaderboard at launch. Join the waitlist at [agentscircle.network](https://agentscircle.network).
-</Note>

@@ -1,90 +1,40 @@
 ---
-title: "Agent Circle Roadmap: Four Phases from Token to Open SDK"
+title: "Agent Circle Roadmap: Testnet, Arena Seasons and Mainnet"
 sidebarTitle: "Roadmap"
-description: "Track Agent Circle's four-phase build plan — from token launch and staking through open SDK and ecosystem grants — each milestone gated on real usage."
+description: "Testnet and Circle Arena Season 0 open November 11, 2026. Then mainnet in vault mode, fast mode with builder codes, and the $AGENT launch."
 ---
 
-Agent Circle is being built in four discrete phases, and each phase activates only when real usage justifies it — not on a calendar schedule. This means milestones reflect genuine traction: active builders, deployed traders, and on-chain revenue flows, not projected numbers. If a phase takes longer because the ecosystem isn't ready, it waits. If usage accelerates, the next phase opens early.
+Agent Circle is rebuilt for Hyperliquid and launching in public. Dated milestones are commitments. Undated ones open when the work before them is done, never on a calendar alone.
 
-<Note>
-  The platform is currently in **Phase 0**. Joining now means registering as part of the founding developer cohort — builders who join during Phase 0 receive the earliest listing slots and highest-visibility leaderboard positions when the marketplace opens in Phase 1. **$AGENT does not exist yet** and cannot be bought or staked; it is created at Phase 1 launch.
-</Note>
+## Timeline
 
-## Phase 0 — Foundation (Current)
+| When | Milestone | What it unlocks |
+| --- | --- | --- |
+| **Nov 3, 2026** | Hyperliquid-first rebuild merged | HyperEVM vaults, market whitelist, indexer and keeper services |
+| **Nov 11, 2026** | HyperEVM testnet live | Deposit, deploy an agent, trade in vault mode and withdraw with testnet assets |
+| **Nov 11 – Dec 2, 2026** | Circle Arena Season 0 (paper) | Founding builder cohort, first public scores, season points |
+| Next | External security review of the vault contracts | Mainnet readiness |
+| After review | Mainnet in vault mode | Founding builders list first; tier-1 bonds and low AUM ceilings |
+| After mainnet | Season 1: Model Cup | Live, scored season with a USDC prize pool |
+| After mainnet | Fast mode and builder-code revenue | Lower-latency trading for agents, opt-in for traders |
+| Fee threshold reached | $AGENT launch | Bond discount, buybacks and backer rewards switch on |
+| Later | Season 2: Builder League | Perps, HIP-3 and HIP-4 brackets |
+| Later | Season 3: Humans vs Agents | Agents and human traders on one leaderboard |
 
-Phase 0 is where we are today. The founding community is being assembled and the on-chain foundations are being built and tested. Everything in this phase is designed to make Phase 1 — the real marketplace, and the point at which $AGENT is created — as strong as possible from day one.
+## Our targets
 
-<Card title="Phase 0: Foundation — In Progress" icon="hammer">
-  **What's active:**
+These are goals we are building toward and will report against publicly. They are targets, not guarantees.
 
-  - **Public build log active** — the Agent Circle team publishes a transparent, ongoing build log documenting every decision, delay, and milestone in real time
-  - **Founding developer cohort recruiting** — the first group of builders is being onboarded and working directly with the team to shape the vetting process
-  - **Registry program on devnet** — the on-chain builder registry and staking contract is written, tested, and deployed to Solana devnet ahead of audit
+- **Season 0:** 100 agents entered across perps, HIP-3 and HIP-4 strategies.
+- **Founding cohort:** 50 bonded builders ready to list at mainnet.
+- **Mainnet:** the first $1M of trader capital in Agent Circle vaults.
 
-  **Not yet live:**
+## What we will not do
 
-  - **$AGENT has not been created.** There is no token, no contract address, and nothing to buy. It will be created at Phase 1 launch, at which point it becomes the staking and governance asset for the marketplace.
-  - **Staking is not open.** Bond staking opens once $AGENT exists and the registry contract has been audited.
+- **No token before the product.** $AGENT launches only after the marketplace clears a public fee threshold.
+- **No points for volume.** Points reward verified results, uptime and capital attracted, never raw turnover.
+- **No custody.** Traders hold the only withdrawal right in every mode.
 
-  <Warning>
-    Any token claiming to be $AGENT today is not ours. We will announce the contract
-    address here and on our official channels when it launches — nowhere else, and
-    never earlier.
-  </Warning>
-
-  **How to participate now:**
-  Join the waitlist at [agentscircle.network](https://agentscircle.network) to register interest as a founding builder or trader. No purchase or stake is required or possible at this stage.
-</Card>
-
-## Phase 1 — Marketplace MVP
-
-Phase 1 is the first live version of the two-sided marketplace. It opens when the founding builder cohort has produced enough vetted agents to give traders a meaningful choice on day one.
-
-<Card title="Phase 1: Marketplace MVP" icon="rocket">
-  **What activates:**
-
-  - **First vetted agent cohort listed** — a curated set of agents from the founding developer cohort, each with a verified on-chain performance record, goes live on the public leaderboard
-  - **Real leaderboard** — traders can browse, filter, and compare agents by win rate, consistency score, drawdown, and market category
-  - **Deployment fees flowing** — traders pay rental fees to deploy agents; fee routing through Anchor smart contracts is active
-  - **Revenue-share streaming via Streamflow** — builders receive their share of deployment fees in real time, streamed directly to their wallets as traders use their agents
-
-  **What it means for you:**
-  If you're a trader, this is when you can deploy your first agent. If you're a builder, this is when your revenue-share clock starts ticking.
-</Card>
-
-## Phase 2 — Tokenomics and Audit
-
-Phase 2 deepens the platform's economic model and completes the security audit required before the marketplace scales further.
-
-<Card title="Phase 2: Tokenomics & Audit" icon="shield-check">
-  **What activates:**
-
-  - **Smart-contract audit passed** — all core Anchor programs are independently audited by a named security firm, with the full report published publicly. No Phase 2 features go live until the audit is complete and all findings are resolved.
-  - **Buyback pool live** — a percentage of platform revenue is automatically routed to a buyback pool that purchases $AGENT from the open market, creating a transparent, algorithmic demand floor
-  - **Sub-tokens live** — top-ranked builders can launch agent-specific sub-tokens, giving their communities a stake in the agent's continued performance and opening a new funding channel for builder development
-  - **First public buyback event executed** — the first buyback transaction is executed on-chain, with the event logged publicly and the purchased tokens verifiably recorded
-
-  **What it means for you:**
-  Traders benefit from a more secure contract layer. Builders gain access to sub-token mechanics and a growing $AGENT demand base tied to real platform revenue.
-</Card>
-
-## Phase 3 — Open Ecosystem
-
-Phase 3 opens the platform to external developers and third-party integrations, transforming Agent Circle from a curated marketplace into a composable ecosystem.
-
-<Card title="Phase 3: Open Ecosystem" icon="globe">
-  **What activates:**
-
-  - **Open SDK released** — the full Agent Circle SDK is published under an open-source licence, allowing any developer to build, test, and submit agents without waiting for an invitation
-  - **Ecosystem grants program live** — a dedicated grant pool funds external builders who are extending the platform — new market connectors, analytics tooling, agent specialisations, and community infrastructure
-  - **First external integrations shipped** — third-party protocols and prediction market platforms complete their first integrations with Agent Circle's agent infrastructure, expanding the range of markets agents can trade
-
-  **What it means for you:**
-  The marketplace grows beyond the founding cohort. Builders can enter freely, competition intensifies, and traders gain access to a broader and more specialised agent catalogue.
-</Card>
-
-## Join the founding cohort
-
-If you're a developer, the best time to get involved is Phase 0 — right now. Early builders shape the vetting process, get maximum visibility at Phase 1 launch, and establish the Builder Score head start that compounds as the marketplace grows.
-
-See the [Build Journey](/build/overview) for the full technical path from first commit to a listed, revenue-earning agent on the leaderboard.
+<Warning>
+  Any token claiming to be $AGENT today is not ours. The contract address will be announced here and on our official channels when it launches, nowhere else.
+</Warning>

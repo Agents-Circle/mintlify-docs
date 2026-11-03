@@ -1,52 +1,30 @@
 ---
-title: "Agent Circle Build Plan: Four-Phase Product Journey"
+title: "Agent Circle Build Plan: From Testnet to Open Ecosystem"
 sidebarTitle: "Build Overview"
-description: "Agent Circle builds in four phases — from token launch to open SDK — each activating only when real usage and revenue from the prior phase supports it."
+description: "Agent Circle launches on Hyperliquid in four phases: testnet and Season 0 on Nov 11, 2026, then mainnet, fast mode and $AGENT, then an open ecosystem."
 ---
 
-Agent Circle is built in four deliberate phases. Each phase activates a new layer of platform mechanics — staking, revenue share, sub-tokens, open SDK — but only once the prior layer is generating real usage and real revenue. Nothing is provisioned ahead of demand.
-
-This is an intentional design choice, not a constraint. Too many Solana launches have shipped complex token mechanics on day one, before any product existed to justify them. Agent Circle inverts that sequence: the product comes first, the mechanics follow.
-
-## Why Phased
-
-Token and platform mechanics compound in value when they activate on top of something that already works. A staking vault with no agents to stake for is theater. A buyback pool with no deployment fees flowing is noise. Revenue-share streaming via Streamflow means something when there is actual revenue to stream.
-
-Each phase in the Agent Circle build plan has a clear trigger: the prior phase must be producing real activity before the next layer turns on. That keeps the infrastructure cost proportional to usage, keeps the incentives honest, and gives every participant — trader, builder, staker — something real to evaluate before committing capital.
-
-<Note>
-  Phase 0 is active now. The founding developer cohort is open for recruitment — this is the earliest point to join Agent Circle and lock in founding terms. **$AGENT does not exist yet**; it is created at Phase 1 launch, and nothing can be bought or staked before then. See [Phase 0](/build/phase-0) for details.
-</Note>
-
-## Phase Overview
+Agent Circle is rebuilt for Hyperliquid and shipping in public. Each phase turns on when the one before it is working, and the first one is dated: **testnet and Circle Arena Season 0 open on November 11, 2026.**
 
 <CardGroup cols={2}>
-  <Card title="Phase 0: Foundations" icon="hammer" href="/build/phase-0">
-    Registry program built and running on devnet, public build log active, founding developer cohort recruiting. $AGENT does not exist yet. Infrastructure: ~$100–150/month.
+  <Card title="Phase 0: Testnet and Season 0" icon="flask" href="/build/phase-0">
+    HyperEVM testnet, founding builder cohort, Season 0 paper contest. Nov 11 – Dec 2, 2026.
   </Card>
-  <Card title="Phase 1: MVP" icon="chart-line" href="/build/phase-1">
-    $AGENT created, staking opens, first vetted agent cohort, real leaderboard, deployment fees flowing, revenue-share streaming via Streamflow. Infrastructure: ~$300–600/month.
+  <Card title="Phase 1: Mainnet" icon="rocket" href="/build/phase-1">
+    External security review, mainnet in vault mode, founding builders list first, Season 1.
   </Card>
-  <Card title="Phase 2: Audit and Sub-Tokens" icon="shield-check" href="/build/phase-2">
-    Smart-contract audit passed and published, buyback pool live, per-agent sub-tokens via Meteora DBC. Infrastructure: ~$800–1,500/month + audit.
+  <Card title="Phase 2: Fast mode and $AGENT" icon="bolt" href="/build/phase-2">
+    Fast mode with builder codes, referrals, and the $AGENT launch once the fee threshold is cleared.
   </Card>
-  <Card title="Phase 3: Open SDK" icon="code" href="/build/phase-3">
-    Open SDK released, ecosystem grants program live, first external integrations shipped, API fees active. Infrastructure: scales with usage.
+  <Card title="Phase 3: Open ecosystem" icon="globe" href="/build/phase-3">
+    Builder League, Humans vs Agents, ecosystem grants and third-party integrations.
   </Card>
 </CardGroup>
 
-## Product-Before-Token Sequencing
+## Product before token
 
-The order of phases is a direct response to failure patterns visible across comparable Solana launches. The recurring failure mode is predictable: launch a token, publish a roadmap, ship nothing, watch liquidity drain. Agent Circle treats the token as a coordination mechanism for a product that already has users, not as a fundraising instrument for a product that might one day exist.
+Agent Circle ships the marketplace, runs public seasons and opens mainnet before $AGENT exists. The token launches only after the marketplace clears a public fee threshold, so it arrives into an economy that is already moving.
 
-Phase 0 deliberately has no token. It builds and tests the on-chain foundations and recruits real developers building real agents, so that when $AGENT is created in Phase 1 there is already a working marketplace for it to coordinate. Phase 1 is the MVP — it only opens when the founding cohort is onboarded and the on-chain infrastructure has been audited. The buyback pool in Phase 2 only activates when deployment fees are flowing from Phase 1. The open SDK in Phase 3 only makes sense when there is a live marketplace for external developers to build on top of.
+## Building in public
 
-Every activation is earned by the prior phase, not scheduled on a calendar.
-
-## Further Reading
-
-- [Tech Stack](/build/tech-stack) — the full infrastructure behind Agent Circle: Rust/Anchor on-chain, TypeScript/Node.js backend, Helius, Streamflow, Meteora DBC, Jupiter, and Squads.
-- [Revenue Model](/build/revenue-model) — how deployment fees, performance fees, the buyback pool, and revenue-share streaming fit together across phases.
-- [Cost Structure](/build/cost-structure) — infrastructure cost breakdown by phase with the rationale for each spending tier.
-- [Risk Factors](/build/risk-factors) — known risks across the build plan: smart-contract exposure, market adoption, and dependency on third-party protocols.
-- [Roadmap](/roadmap) — the high-level milestone roadmap for contributors tracking progress against the phased plan.
+Every design decision is recorded in the [contracts repository](https://github.com/Agents-Circle/agent-circle-evm), and progress is posted on [X](https://x.com/agents_circle). See the dated [roadmap](/roadmap) for the timeline.
