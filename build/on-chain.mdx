@@ -10,7 +10,7 @@ description: "Per-trader vault clones that are their own HyperCore accounts, a U
 
 **`HLAgentVaultFactory`.** Deploys one EIP-1167 minimal-proxy vault per trader and listing.
 
-**`HLAgentVault`.** Holds the trader's position on HyperCore. In vault mode it checks six conditions before sending each order; it reconciles orders, charges fees on reconciled size, and enforces the drawdown kill switch. Only the trader can withdraw.
+**`HLAgentVault`.** Holds the trader's position on HyperCore. In vault mode it checks six conditions before sending each order; it reconciles orders, charges fees on reconciled size, and enforces the drawdown kill switch. Only the trader can withdraw. [The Hyperliquid vault](/architecture/hyperliquid-vault) walks through it call by call.
 
 **`HLMarketWhitelist`.** The HyperCore assets agents may trade. Additions are timelocked and public; removals are immediate.
 

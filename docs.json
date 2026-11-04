@@ -38,6 +38,7 @@
             "pages": [
               "concepts/marketplace",
               "concepts/agents",
+              "concepts/venues",
               "concepts/execution-modes",
               "concepts/parameters",
               "concepts/builder-score",
@@ -57,11 +58,19 @@
             "group": "For Builders",
             "pages": [
               "builders/overview",
-              "builders/circle-arena",
-              "builders/arena-rules-and-scoring",
+              "builders/quickstart-hyperliquid",
               "builders/revenue-share",
               "builders/backer-stakes",
               "builders/sdk-grants"
+            ]
+          },
+          {
+            "group": "Circle Arena",
+            "pages": [
+              "builders/circle-arena",
+              "arena/overview",
+              "arena/seasons",
+              "builders/arena-rules-and-scoring"
             ]
           },
           {
@@ -93,6 +102,7 @@
             "pages": [
               "build/tech-stack",
               "build/on-chain",
+              "architecture/hyperliquid-vault",
               "build/backend",
               "build/infrastructure"
             ]
@@ -109,6 +119,12 @@
       }
     ]
   },
+  "redirects": [
+    {
+      "source": "/traders/execution-modes",
+      "destination": "/concepts/execution-modes"
+    }
+  ],
   "fonts": {
     "heading": {
       "family": "Bricolage Grotesque",

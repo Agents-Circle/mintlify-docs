@@ -1,0 +1,140 @@
+---
+title: "The Hyperliquid Vault: HLAgentVault Call by Call"
+sidebarTitle: "Hyperliquid Vault"
+description: "How an Agent Circle vault on HyperEVM opens, takes deposits, places and reconciles orders, charges fees, switches to fast mode and pays the trader out, with the limits of each step."
+---
+
+`HLAgentVault` is the contract a trader's capital sits in. One clone is deployed per trader and listing, and its address is its own HyperCore account. This page walks through it call by call. For the design reasoning, read ADR-0001 (vault topology) and ADR-0002 (execution modes) in [agent-circle-evm](https://github.com/Agents-Circle/agent-circle-evm/tree/main/docs/adr).
+
+<Warning>
+  Deployed on **HyperEVM testnet only**. Nothing is on mainnet, and the contracts have not had an external security review. The test suite runs against a mocked HyperCore. The testnet end-to-end run, which answers what the mocks cannot, has not been run yet.
+</Warning>
+
+## Contracts and addresses
+
+HyperEVM testnet, chain 998, deployed November 4, 2026. RPC: `https://rpc.hyperliquid-testnet.xyz/evm`.
+
+| Contract | Role | Address |
+| --- | --- | --- |
+| `AgentRegistry` | Builders, USDC bonds, listings and their terms | `0x6757474DDC00CDa23F497faC09A2CD4B27117aCe` |
+| `HLMarketWhitelist` | HyperCore assets vaults may trade, with timelocked additions | `0x1445B9E5080a9fB5dfdB97537935f8D4c40F3f4A` |
+| `HLAgentVault` | The implementation every vault clones | `0x3861eAbE8219E52a913B37fdB63bB0cF5BE0bCcb` |
+| `HLAgentVaultFactory` | Deploys one clone per trader and listing | `0x7c5F82a727ff7823E1EabC49119A6d6e823779b8` |
+| USDC (testnet) | Deposits and bonds | `0x2B3370eE501B4a559b57D449569354196457D8Ab` |
+
+## The fact that shapes the contract
+
+CoreWriter, the contract that sends actions from HyperEVM to HyperCore, is fire-and-forget. Sending an order succeeds whether or not HyperCore accepts it, and HyperCore can drop an order for a bad tick size, a bad lot size, missing margin or an unlisted asset. Nothing on the HyperEVM side can tell at the time.
+
+So `placeOrder` only knows it asked. The vault's list of open orders is a hypothesis, which it books as reservations and settles later in `reconcile`. Most of what follows is a consequence of that.
+
+## Opening a vault
+
+**`factory.deployVault(listingId, positionCapBps, maxDrawdownBps)`**, called by the trader.
+
+- The trader is always the caller. Nobody can open a vault owned by someone else.
+- The address is deterministic per trader and listing, so a trader cannot open two vaults on one listing to sit under a cap twice. `predictVault(trader, listingId)` returns it before deployment.
+- The listing must be live. Pass `0` for either limit to inherit the listing's own. A trader's limits can only be stricter than the listing's, never looser.
+- The registry trusts a vault only because the factory recorded deploying it. `setVaultFactory` can be called once.
+
+## Deposits
+
+**`deposit(amount)`**, trader only, while the vault is active.
+
+1. The amount must fit within the builder's remaining capacity, which their bond tier sets.
+2. The vault pulls the USDC, bridges it to HyperCore and moves it from spot to the perp account. Skipping the second hop would leave it invisible to perp margin, and every order would be dropped silently.
+3. Both hops are asynchronous, so the amount is recorded as `pendingBridge`, not as balance. The high-water mark rises by the deposit at once, so fresh capital is never read as profit.
+
+`reconcile` marks the deposit settled once HyperCore equity covers it, or after 15 minutes regardless. Until then it does not measure drawdown. Because the high-water mark has already risen, `placeOrder`'s drawdown check can refuse orders until the deposit lands.
+
+## Placing an order (vault mode)
+
+**`placeOrder(asset, isBuy, limitPx, sz, reduceOnly, tif, cloid)`**, agent key only. Price and size are scaled by 1e8; `tif` is 1 (ALO), 2 (GTC) or 3 (IOC).
+
+Six checks run before the order is sent:
+
+1. The vault is active.
+2. The listing is live.
+3. The caller is the listing's agent key.
+4. The asset is on the market whitelist.
+5. Every tracked position at the current mark, plus every outstanding reservation, plus this order's worst case, stays within the position cap. The cap is the stricter of the vault's and the asset's own.
+6. Equity is within the drawdown limit from the high-water mark.
+
+Reduce-only orders skip check 5, so a vault over its cap can always reduce. The vault also refuses a ninth open order.
+
+A passing order books a reservation of `sz × limitPx`, the most it could cost, and is sent to HyperCore. No fee is charged here.
+
+<Note>
+  The position cap is measured in aggregate across every tracked position, while `params/parameters.json` describes it per position. Which reading is intended is an open protocol decision. This page describes what the contract does.
+</Note>
+
+## Reservations
+
+A reservation holds its share of the cap and its open-order slot until it is released, and **a fill does not release it**. The vault cannot see fills at send time. A reservation is released when:
+
+- **`cancelOrder(cloid)`** is called by the trader or the agent. It also sends the cancel to HyperCore.
+- **`cancelAll(cloids)`** is called by the trader or the agent, clearing every listed reservation in one transaction. With at most 8 open orders, that is always one transaction.
+- **It expires.** Every reservation lapses 1 hour after it was booked. After that, any `reconcile` call that names it releases it, so clearing a dropped order needs no cooperation from the agent.
+
+## Reconcile
+
+**`reconcile(staleCloids)`**, callable by anyone. Everything it does is neutral or in the trader's favour, and no single party can be relied on to call it.
+
+1. Settles a pending deposit once HyperCore shows it, or after the 15-minute grace period.
+2. Charges the execution fee on size that actually changed.
+3. Releases the expired reservations it is given.
+4. Raises the high-water mark. If drawdown has reached the limit, it pauses the vault and sends reduce-only closes for every tracked asset.
+
+Agent Circle's keeper service is written to call `reconcile` on the vaults that need it. It holds no other authority over a vault.
+
+## Fees
+
+**Execution fee, at reconcile.** For each tracked asset, the vault measures how far the position size moved since the last reconcile and charges the listing's execution fee on that change at the mark price. An order HyperCore rejected changed nothing, so it costs nothing. In the other direction, a position opened and closed entirely between two reconciles shows no change and is not billed.
+
+**Performance fee, weekly.** **`assessFees()`**, callable by anyone at most once every 7 days, charges the listing's performance fee on equity above the high-water mark.
+
+Both fees accrue as claims split between builder and platform at the listing's terms. **`sweepFees()`**, callable by anyone, pays them from USDC on the HyperEVM side. When the balance does not cover both claims, it pays them in proportion.
+
+## Withdrawal and exit
+
+Withdrawal is two steps, because HyperCore to HyperEVM is asynchronous.
+
+1. **`requestWithdraw(amount)`**, trader only, in every vault state: paused, closing, listing suspended or delisted, asset removed. The amount cannot exceed equity minus reserved capital. The vault moves it from perp to spot and asks HyperCore to bridge it back.
+2. **`finalizeWithdraw()`**, callable by anyone, sweeps accrued fees and then pays the trader what has arrived, up to the amount pending. It lowers the high-water mark by the same amount.
+
+<Warning>
+  Bridging USDC back from HyperCore needs HYPE on HyperCore to pay for the transfer. A vault that has never held HYPE may be unable to complete the bridge, and the amount needed is not documented. Until that is settled, the accurate claim is that **withdrawal is never blocked by the protocol**: no vault state, listing state or whitelist change can stop it. It is not yet that withdrawal always succeeds.
+</Warning>
+
+**`exitPosition(asset)`**, trader or agent, in any state, closes one position with a reduce-only IOC priced 50% through the mark, so it crosses whatever is on the book. It accepts slippage deliberately: this path runs when a vault is already in trouble.
+
+The trader also has **`pause()`**, **`resume()`** and **`tightenRiskLimits(positionCapBps, maxDrawdownBps)`**, which, like the overrides at opening, can only make limits stricter.
+
+## Fast mode
+
+**`enableFastMode(apiWallet)`**, trader only, while the vault is active and the listing is live. In one call the vault:
+
+1. Sets its HyperCore account mode. Builder fees accrue only in "standard" mode, and HyperCore's options do not name one. The vault sends `1` (no abstraction). Whether that is standard mode is unconfirmed.
+2. Registers the agent's key as a HyperCore API wallet. An API wallet can trade but cannot withdraw.
+3. Approves Agent Circle's builder address for a fee of at most the listing's execution fee.
+
+From then on, the agent signs orders directly on HyperCore and the vault never sees them. **Limits are monitored, not enforced.**
+
+- **Drawdown:** when anyone calls `reconcile` past the limit, the vault pauses and sends reduce-only closes. How far past the limit a vault travels depends on how often the keeper polls. Pausing does not unregister the API wallet.
+- **Position cap:** the keeper can record a breach, but no call it is allowed to make reduces the position. The remedies are the trader's (pause, exit, withdraw) and governance's (suspend the listing).
+
+**`disableFastMode()`**, trader or agent, clears the vault's record of the API wallet, pauses the vault, re-registers the wallet name with an empty address and sends reduce-only closes. Whether that revokes the old key on HyperCore is unconfirmed, so the call does not rely on it: a surviving key would have no position to trade and no way to withdraw.
+
+When fast mode is offered is on the [roadmap](/roadmap). See [Execution modes](/concepts/execution-modes) for the trader's side.
+
+## What the tests prove, and what they do not
+
+The test suite places mocks at the real precompile and CoreWriter addresses, so the production contract runs against production library code. It covers the vault's own logic: reservations count against the cap, a thin market's cap binds first, reduce-only orders skip the cap, a dropped order cannot hold capital past expiry, withdrawal is reachable in every vault and listing state, and the execution fee charges fills rather than requests.
+
+It proves nothing about Hyperliquid itself: matching, fees, margin, tick sizes, or whether any of these actions are accepted. That is what the testnet end-to-end run is for. Its open questions are listed in ADR-0002:
+
+- Which account mode lets builder fees accrue.
+- How much HYPE a vault needs on HyperCore to bridge USDC back.
+- Whether replacing an API wallet revokes the old key.
+- Whether CoreWriter orders work on HIP-3 and HIP-4 assets.
+- Whether CoreWriter is enabled for every asset class on mainnet.

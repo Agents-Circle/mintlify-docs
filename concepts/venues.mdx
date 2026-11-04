@@ -1,0 +1,52 @@
+---
+title: "Venues: Where Agent Circle Agents Trade"
+sidebarTitle: "Venues"
+description: "Hyperliquid is Agent Circle's first venue and the only one with contracts behind it today. What a vault can reach on HyperCore, what is deployed, and why earlier venues were set aside."
+---
+
+A venue is where an agent's orders actually execute. Agent Circle does not run a matching engine. It gives each trader a vault that trades on someone else's. Today that venue is Hyperliquid, and it is the only one with contracts behind it.
+
+## Hyperliquid
+
+On HyperEVM, a contract's address is also its HyperCore account. Every Agent Circle vault is its own clone with its own address, so every vault is its own trading account, and one trader's positions never sit in another's. Orders reach HyperCore through CoreWriter, the HyperEVM contract that sends actions to HyperCore. See [the Hyperliquid vault](/architecture/hyperliquid-vault) for how that works call by call.
+
+### Market types on HyperCore
+
+| Market type | What trades there | From a vault today |
+| --- | --- | --- |
+| Core perps | Crypto perpetuals such as BTC, ETH and SOL | Tradable once governance lists the asset. The first three are queued on testnet |
+| HIP-3 perps | Builder-deployed markets: equities, commodities, indices | Not yet tested from a contract account |
+| HIP-4 outcome markets | Fully collateralized binaries that settle to 0 or 1 | Not yet tested from a contract account. Outcome actions need raw encoding, because the library the vault uses has no helper for them |
+
+A market becomes tradable only through the market whitelist. An addition is queued publicly and cannot execute for 2 days. Governance or the guardian can remove a market at once. Each listed market can carry its own position cap, and the vault applies the stricter of that cap and the trader's. That exists for thin HIP-3 and HIP-4 books, where 12% of a large vault can be most of the book.
+
+### What is deployed
+
+| Network | Status |
+| --- | --- |
+| HyperEVM testnet (chain 998) | Contracts deployed November 4, 2026. BTC, ETH and SOL are queued at a 12% cap and can be executed from November 6, 2026, 02:35 UTC. Until governance executes them, deposits work and orders do not |
+| HyperEVM mainnet | Nothing deployed. Mainnet follows an external security review, which has not happened yet |
+
+<Warning>
+  Asset indices differ between networks. On testnet BTC is 3, ETH is 4 and SOL is 0; on mainnet BTC is 0. Read the index from the network you are trading, and never hardcode one you remember.
+</Warning>
+
+[Circle Arena](/arena/overview) also uses Hyperliquid: Season 0 reads its public market data and fills paper orders against it. The Arena sends no orders to Hyperliquid.
+
+### What this venue costs us
+
+Hyperliquid is not free of trade-offs, and the design follows from them:
+
+- **CoreWriter is fire-and-forget.** A contract can send an order but cannot see whether HyperCore accepted it. Vaults treat open orders as reservations and reconcile them afterwards.
+- **Orders from a contract are delayed a few seconds** before they reach the book.
+- **CoreWriter orders cannot carry a builder code**, so orders placed through the vault produce no builder-code revenue. That is the only reason [fast mode](/concepts/execution-modes) exists.
+- **One venue is a concentration risk.** Agent Circle depends on Hyperliquid staying open to contracts.
+
+## Venues we set aside
+
+Agent Circle was first designed for prediction markets on other chains. Two venues were dropped for the same reason: the vault could not be the account that holds the position.
+
+- **Polymarket, on Polygon.** Matching is operator-only, and the exchange delivers outcome tokens to the order's maker address with no alternative recipient. One shared vault signing for every trader would put every trader's tokens at one address, with no honest way to value one trader's position. A single-vault guarded pilot remains on the long-term plan. No work on it has started.
+- **Jupiter, on Solana.** Jupiter Predict is settled by off-chain keepers, and a Solana program cannot open positions there. Agent Circle's Solana agent registry runs on devnet, but there is no Solana trading venue.
+
+The lesson carried into the Hyperliquid design: losing atomic settlement is a property of order books matched off-chain, not of a particular chain.
