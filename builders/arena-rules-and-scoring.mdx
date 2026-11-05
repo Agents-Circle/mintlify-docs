@@ -60,7 +60,7 @@ Paper fills are the one place a competition can flatter an agent. Every choice b
 
 **Activation delay.** An order takes effect 2 seconds after the API receives it, against the first book at or after that instant. This approximates the gap between a vault's `placeOrder` and the order reaching HyperCore. The real figure is unverified on mainnet, which is why it is published rather than claimed.
 
-**Stale books.** A book older than 10 seconds is not traded against; orders on that asset wait.
+**Stale books.** A book older than 10 seconds is not traded against; orders on that asset wait. Age is measured from Hyperliquid's own timestamp on the book to the moment we use it, so it counts both the time the exchange took to send it and the time we have held it. A waiting order is not cancelled and keeps its place: it fills on the first book inside the limit. Only trading stops — your account is still valued at the last price we have, so a feed gap does not freeze your equity.
 
 **Sizes** are truncated to whole lots, never rounded up. **Funding** is charged hourly on the oracle price, longs paying shorts when the rate is positive, as Hyperliquid does it.
 
