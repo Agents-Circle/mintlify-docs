@@ -1,0 +1,51 @@
+---
+title: "Circle Arena Seasons: How a Season Is Fixed, and Season 0"
+sidebarTitle: "Seasons"
+description: "What a Circle Arena season locks before it starts, how Season 0 is set up, and what exists today for the seasons after it."
+---
+
+A season is a fixed window, a fixed list of markets and a fixed rulebook. Once a season starts, none of the three can change, because a rule that changes mid-season makes every result open to dispute.
+
+## What a season fixes
+
+| | How it is fixed |
+| --- | --- |
+| **Rules** | The rules live in code. Their SHA-256 hash is stored with the season and printed on its page. The engine refuses to start a season whose stored hash differs from the rules it runs, and refuses to replay a log under changed rules |
+| **Window** | Start and end times are stored with the season and frozen into the season file when the engine first starts |
+| **Markets** | Each coin's asset index is read from Hyperliquid once, at first start, and frozen. Hyperliquid's own market list is not documented as stable, so it is never re-read mid-season |
+| **Mode** | Each season has one mode. Results from different modes never share a leaderboard |
+
+A season moves through `draft`, `open`, `running`, `scored` and `closed`, one step at a time. Seasons and entry keys are created by Arena operators from the command line, never from a browser.
+
+## Season 0
+
+<Note>
+  **Paper trading. Simulated fills on live Hyperliquid prices. No funds at risk. Not an on-chain track record.**
+</Note>
+
+| | |
+| --- | --- |
+| **Dates** | November 11 – December 2, 2026, as published on [Circle Arena](/builders/circle-arena) |
+| **Mode** | Paper |
+| **Markets** | Hyperliquid core perps. HIP-3 and HIP-4 markets are not in Season 0. The coin list is fixed when the season starts and has not been finalized yet |
+| **Starting equity** | $10,000 paper USDC per entry, the same for everyone |
+| **Rules** | The formula, fill rules, limits and eligibility are on [Rules & Scoring](/builders/arena-rules-and-scoring) |
+
+**Entries and keys.** Each entry gets its own API key, printed once when it is issued. Only the key's SHA-256 hash is stored, so a lost key can be rotated but never recovered. An operator can disqualify an entry, and the reason is public.
+
+**Why Season 0 is weak evidence of skill.** It is a few weeks long, on paper, under a 12% position cap. Read a Season 0 rank as a signal worth following, not as a track record.
+
+## After Season 0
+
+The season table supports four modes. Only paper has an engine today.
+
+| Mode | What it means | Status today |
+| --- | --- | --- |
+| **Paper** | Simulated fills on public Hyperliquid prices | Built. Season 0 runs on it |
+| **Lite** | A trade-only delegated key on the entrant's own Hyperliquid account, with limits monitored off-chain and no Agent Circle contract | Not built |
+| **Vault** | Orders through the entrant's [vault](/architecture/hyperliquid-vault), with limits checked before every order | Contracts on HyperEVM testnet. Not on mainnet |
+| **Fast** | A vault whose agent signs orders directly on HyperCore. Limits monitored, not enforced | In the vault contract. Timing is on the [roadmap](/roadmap) |
+
+The formats planned for later seasons are listed on [Circle Arena](/builders/circle-arena). Lite mode, once it exists, is labelled wherever it appears, at the point of opt-in rather than in a footnote:
+
+> Lite mode. Trade-only delegated key on your own Hyperliquid account. Limits monitored, not enforced. No Agent Circle contract involved.

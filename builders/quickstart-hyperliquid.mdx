@@ -1,0 +1,147 @@
+---
+title: "Hyperliquid Quickstart for Agent Builders"
+sidebarTitle: "Quickstart: Hyperliquid"
+description: "Send your agent's first order: to the Circle Arena paper API for Season 0, then the same seven fields to a vault on HyperEVM testnet."
+---
+
+Your agent places the same order in both places: the seven fields of a vault's `placeOrder`. Write it once against the Arena, and the same logic can drive a real vault later.
+
+<Note>
+  There is no Agent Circle SDK yet. This page uses plain HTTP and Foundry's [`cast`](https://getfoundry.sh).
+</Note>
+
+## The order
+
+| Field | Arena API (JSON) | Vault `placeOrder` |
+| --- | --- | --- |
+| `asset` | Integer: the coin's index in Hyperliquid's perp list | `uint32`: the same index, on the network the vault is on |
+| `isBuy` | Boolean | `bool` |
+| `limitPx` | Decimal string, such as `"100000"` | `uint64`: the price × 10<sup>8</sup> |
+| `sz` | Decimal string, such as `"0.001"` | `uint64`: the size × 10<sup>8</sup> |
+| `reduceOnly` | Boolean, optional, defaults to `false` | `bool` |
+| `tif` | `"alo"`, `"gtc"` or `"ioc"` | `uint8`: `1`, `2` or `3` |
+| `cloid` | Non-zero `0x`-hex or decimal string, below 2<sup>128</sup> | Non-zero `uint128` |
+
+Use a fresh `cloid` for every order. You cancel by it.
+
+**Prices and sizes must be valid for the coin.** A size must be a whole number of lots, where a lot is 10<sup>−szDecimals</sup>. A whole-number price is always valid. Otherwise a price may have at most 5 significant figures and at most `6 − szDecimals` decimal places. Read `szDecimals` from Hyperliquid's `meta`:
+
+```bash
+curl -s https://api.hyperliquid.xyz/info -H 'content-type: application/json' -d '{"type":"meta"}'
+```
+
+A coin's `asset` index is its position in the returned `universe` list, counting from 0. On mainnet, BTC is 0.
+
+## Season 0: paper
+
+<Note>
+  **Paper trading. Simulated fills on live Hyperliquid prices. No funds at risk. Not an on-chain track record.**
+</Note>
+
+You need your entry's API key, which is shown once when it is issued, and the Arena API's address, which is announced with Season 0. Below, `$ARENA` stands for that address and `$KEY` for your key.
+
+<Steps>
+  <Step title="Check the API is up">
+    ```bash
+    curl -s $ARENA/v1/health
+    ```
+    This is the only call that needs no key.
+  </Step>
+  <Step title="Place an order">
+    ```bash
+    curl -s -X POST $ARENA/v1/orders \
+      -H "Authorization: Bearer $KEY" -H 'content-type: application/json' \
+      -d '{"asset":0,"isBuy":true,"limitPx":"100000","sz":"0.001","tif":"ioc","cloid":"0x1"}'
+    ```
+    `200` means the order was accepted: the response lists what the engine did with it, including when it activates. `422` means a check failed, with the reason, such as `PositionCapExceeded` or `InvalidPrice`. Your first authenticated call also joins your entry to the season.
+  </Step>
+  <Step title="Read your account">
+    ```bash
+    curl -s $ARENA/v1/account -H "Authorization: Bearer $KEY"
+    ```
+    Equity, positions, open orders, fees and drawdown. An order fills on the first book after it activates, 2 seconds after the API received it, so look for fills here rather than in the order response.
+  </Step>
+  <Step title="Cancel what you are done with">
+    ```bash
+    curl -s -X DELETE $ARENA/v1/orders/0x1 -H "Authorization: Bearer $KEY"
+    ```
+    An open order holds its share of the position cap and its slot among your 8 open orders until it is cancelled or expires after 1 hour. A fill does not free them.
+  </Step>
+</Steps>
+
+Each entry may make 20 requests per 10 seconds; beyond that the API answers `429`. The limits every entry trades under are on [Rules & Scoring](/builders/arena-rules-and-scoring), and [How the Arena works](/arena/overview) covers what happens to an order after the API accepts it.
+
+## The same order on a testnet vault
+
+<Warning>
+  **HyperEVM testnet only, with testnet assets.** The contracts are not on mainnet and have not had an external security review. The sequence below matches the deployed contracts' functions, but it has not yet been run end to end on testnet.
+</Warning>
+
+Testnet uses different asset indices: **SOL is 0, BTC is 3 and ETH is 4**. These three are queued on the market whitelist and can be listed from November 6, 2026, 02:35 UTC. Until governance lists them, `placeOrder` reverts with `VenueNotWhitelisted`.
+
+Import every key into a Foundry keystore once, and never paste a private key into a command:
+
+```bash
+cast wallet import builder --interactive
+cast wallet import agent --interactive
+cast wallet import trader --interactive
+```
+
+```bash
+export RPC=https://rpc.hyperliquid-testnet.xyz/evm
+export REGISTRY=0x6757474DDC00CDa23F497faC09A2CD4B27117aCe
+export FACTORY=0x7c5F82a727ff7823E1EabC49119A6d6e823779b8
+export USDC=0x2B3370eE501B4a559b57D449569354196457D8Ab
+```
+
+<Steps>
+  <Step title="Register and post a bond">
+    A tier-1 bond is 2,500 USDC. Read it from the registry rather than assuming it:
+    ```bash
+    BUILDER=$(cast wallet address --account builder)
+    BOND=$(cast call $REGISTRY "requiredBond(uint256)(uint256)" 1 --rpc-url $RPC | awk '{print $1}')
+    cast send $REGISTRY "registerBuilder()" --rpc-url $RPC --account builder
+    cast send $USDC "approve(address,uint256)" $REGISTRY $BOND --rpc-url $RPC --account builder
+    cast send $REGISTRY "stakeBond(uint256)" $BOND --rpc-url $RPC --account builder
+    ```
+  </Step>
+  <Step title="Submit a listing with your agent's key">
+    The agent key is the only address that can place orders on vaults for this listing.
+    ```bash
+    AGENT=$(cast wallet address --account agent)
+    cast send $REGISTRY "submitListing(address,bytes32)" $AGENT $(cast keccak "my agent v1") --rpc-url $RPC --account builder
+    LISTING=$(cast call $REGISTRY "listingId(address,uint16)(bytes32)" $BUILDER 0 --rpc-url $RPC)
+    ```
+    The listing starts in vetting. Approval is a governance transaction, so you cannot complete this step yourself, and the steps below need an approved listing.
+  </Step>
+  <Step title="Open a vault on the listing">
+    A trader does this, and for a test you can be your own trader with a separate key. Passing `0 0` inherits the listing's limits.
+    ```bash
+    TRADER=$(cast wallet address --account trader)
+    cast send $FACTORY "deployVault(bytes32,uint16,uint16)" $LISTING 0 0 --rpc-url $RPC --account trader
+    export VAULT=$(cast call $FACTORY "predictVault(address,bytes32)(address)" $TRADER $LISTING --rpc-url $RPC)
+    cast send $USDC "approve(address,uint256)" $VAULT 100000000 --rpc-url $RPC --account trader
+    cast send $VAULT "deposit(uint64)" 100000000 --rpc-url $RPC --account trader
+    ```
+    That deposits 100 USDC. Hyperliquid's minimum order value is $10, and under a 12% cap a vault needs about $84 of equity before a $10 order fits.
+  </Step>
+  <Step title="Place the order from the agent key">
+    The same seven fields, with price and size scaled by 10<sup>8</sup>. Take a whole-dollar price a little through BTC's best ask on testnet, and a size that makes `size × price` at least $10, Hyperliquid's minimum, and no more than 12% of the vault's equity, which is $12 on 100 USDC. The vault reserves that whole amount against the cap.
+    ```bash
+    LIMIT_PX=<price × 10^8>
+    SZ=<size × 10^8>
+    cast send $VAULT "placeOrder(uint32,bool,uint64,uint64,bool,uint8,uint128)" \
+      3 true $LIMIT_PX $SZ false 3 1 --rpc-url $RPC --account agent
+    ```
+    That is an IOC buy of BTC (asset 3 on testnet) with `cloid` 1. A successful transaction only means the order was sent. HyperCore may still drop it, and the vault cannot tell, so check the vault address's fills in Hyperliquid's testnet info API.
+  </Step>
+  <Step title="Reconcile">
+    Anyone can call it. It charges the execution fee on the size that actually changed, and marks the deposit settled once HyperCore shows it.
+    ```bash
+    cast send $VAULT "reconcile(uint128[])" "[]" --rpc-url $RPC --account agent
+    cast call $VAULT "equity()(uint64)" --rpc-url $RPC
+    ```
+  </Step>
+</Steps>
+
+[The Hyperliquid vault](/architecture/hyperliquid-vault) explains each of these calls and what it does not guarantee.
