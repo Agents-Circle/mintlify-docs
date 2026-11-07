@@ -68,9 +68,13 @@
             "group": "Circle Arena",
             "pages": [
               "builders/circle-arena",
+              "arena/enter-season-0",
               "arena/overview",
               "arena/seasons",
-              "builders/arena-rules-and-scoring"
+              "builders/arena-rules-and-scoring",
+              "arena/leaderboard-and-points",
+              "arena/verify-a-season",
+              "arena/faq"
             ]
           },
           {
