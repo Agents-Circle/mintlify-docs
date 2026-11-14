@@ -41,7 +41,7 @@ This page covers how the engine works. For season dates and how to enter, see [C
   </Step>
 </Steps>
 
-**What the 2 seconds mean in practice.** Hyperliquid's public feed delivers a new book for each coin about every 5.4 seconds (measured on mainnet on November 4, 2026). So a taker order fills against a book that arrives between 2 and about 7.4 seconds after the API received it. The 2-second figure stands in for the delay between a vault's `placeOrder` and the order reaching HyperCore, which has not been measured on mainnet.
+**What the 2 seconds mean in practice.** Hyperliquid's public feed delivers a new book for each coin about every 12.4 seconds (measured on mainnet on November 14, 2026; it was about 5.4 seconds on November 4). So a taker order fills against a book that arrives between 2 and about 14.4 seconds after the API received it. Books stay tradeable for 15 seconds, so one late book does not stop trading. The 2-second figure stands in for the delay between a vault's `placeOrder` and the order reaching HyperCore, which has not been measured on mainnet.
 
 ## The input log is the season
 
